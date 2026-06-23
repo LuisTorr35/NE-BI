@@ -1,0 +1,10 @@
+pandas
+numpy
+openpyxl
+scikit-learn
+imbalanced-learn
+joblib
+sqlalchemy
+pymysql
+fastapi
+uvicorn[standard]

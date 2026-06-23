@@ -1,0 +1,130 @@
+{
+  "seleccionado": "Random Forest (balanced)",
+  "comparacion": [
+    {
+      "modelo": "Regresion Logistica (balanced)",
+      "accuracy": 0.8446,
+      "precision": 0.5241,
+      "recall": 0.8579,
+      "f1": 0.6507,
+      "roc_auc": 0.903,
+      "matriz_confusion": [
+        [
+          788,
+          148
+        ],
+        [
+          27,
+          163
+        ]
+      ],
+      "f1_cv_mean": 0.613,
+      "f1_cv_std": 0.0098
+    },
+    {
+      "modelo": "Random Forest (balanced)",
+      "accuracy": 0.9609,
+      "precision": 0.8318,
+      "recall": 0.9632,
+      "f1": 0.8927,
+      "roc_auc": 0.9946,
+      "matriz_confusion": [
+        [
+          899,
+          37
+        ],
+        [
+          7,
+          183
+        ]
+      ],
+      "f1_cv_mean": 0.8171,
+      "f1_cv_std": 0.0195
+    },
+    {
+      "modelo": "Random Forest + SMOTE",
+      "accuracy": 0.9485,
+      "precision": 0.8626,
+      "recall": 0.8263,
+      "f1": 0.8441,
+      "roc_auc": 0.9864,
+      "matriz_confusion": [
+        [
+          911,
+          25
+        ],
+        [
+          33,
+          157
+        ]
+      ],
+      "f1_cv_mean": 0.7808,
+      "f1_cv_std": 0.0293
+    }
+  ],
+  "top_importancias": [
+    {
+      "feature": "num__tenure",
+      "importancia": 0.1744
+    },
+    {
+      "feature": "num__es_cliente_nuevo",
+      "importancia": 0.159
+    },
+    {
+      "feature": "num__cashback_amount",
+      "importancia": 0.0742
+    },
+    {
+      "feature": "num__complain",
+      "importancia": 0.063
+    },
+    {
+      "feature": "num__warehouse_to_home",
+      "importancia": 0.0539
+    },
+    {
+      "feature": "num__day_since_last_order",
+      "importancia": 0.0492
+    },
+    {
+      "feature": "num__number_of_address",
+      "importancia": 0.0481
+    },
+    {
+      "feature": "num__satisfaction_score",
+      "importancia": 0.0435
+    },
+    {
+      "feature": "num__order_amount_hike_from_last_year",
+      "importancia": 0.0414
+    },
+    {
+      "feature": "num__city_tier",
+      "importancia": 0.0253
+    },
+    {
+      "feature": "cat__prefered_order_cat_Mobile Phone",
+      "importancia": 0.0252
+    },
+    {
+      "feature": "num__number_of_device_registered",
+      "importancia": 0.0249
+    },
+    {
+      "feature": "num__order_count",
+      "importancia": 0.0229
+    },
+    {
+      "feature": "cat__marital_status_Single",
+      "importancia": 0.0207
+    },
+    {
+      "feature": "num__cupones_por_pedido",
+      "importancia": 0.0178
+    }
+  ],
+  "churn_base_pct": 16.8,
+  "n_train": 4504,
+  "n_test": 1126
+}

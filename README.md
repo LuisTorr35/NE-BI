@@ -149,6 +149,13 @@ php artisan serve --port=8090
 - Admin: `http://localhost:8090/admin/login`
 - Tienda: `http://localhost:8090/`
 
+**Credenciales de demo** (vienen en el dump):
+
+| Acceso | Usuario | Contraseña |
+|---|---|---|
+| Panel admin / BI | `admin@nebi.com` | `admin123` |
+| Cliente (tienda) | cualquier email de cliente, ej. `alan.cepeda.54849@correo.com` | `password` |
+
 ### 3. Modelo (Python)
 ```bash
 cd modelo
@@ -165,6 +172,35 @@ Consigue una API key gratis en <https://console.groq.com/keys> y ponla en
 
 > ⚠️ La `GROQ_API_KEY` va **solo** en `.env` (que está en `.gitignore`); nunca se
 > hardcodea ni se sube al repo.
+
+---
+
+## Ver la pantalla de BI y el chatbot (paso a paso)
+
+Con el dump importado y la tienda corriendo, **el panel BI funciona de inmediato**
+(el riesgo ya está calculado). El chatbot necesita además la `GROQ_API_KEY`.
+
+### Pantalla de BI (clientes en riesgo)
+1. Entra a `http://localhost:8090/admin/login` con `admin@nebi.com` / `admin123`.
+2. En el menú lateral abre **⚠️ Clientes en riesgo**: verás la lista ordenada por
+   probabilidad de abandono, con filtros por nivel, categoría y ciudad.
+3. Haz clic en un cliente (ej. **Alan Cepeda**, el de mayor riesgo) para ver su
+   **detalle**: % de riesgo, nivel, acción sugerida y productos recomendados.
+4. *(Opcional)* Botón **"Re-evaluar en vivo"** → requiere el servicio FastAPI
+   corriendo (`uvicorn api:app --port 9000`, paso 3).
+
+### Chatbot BI
+1. Asegúrate de tener `GROQ_API_KEY` en `.env` (paso 4). Si falta, el chat avisa.
+2. En el menú lateral abre **🤖 Asistente BI**.
+3. Pregunta en español, por ejemplo:
+   - *"¿Quiénes son los 5 clientes con mayor riesgo?"*
+   - *"¿Cuántos clientes hay en cada nivel de riesgo?"*
+   - *"¿El cliente Alan Cepeda se va a abandonar?"*
+   Bajo cada respuesta verás qué herramienta consultó (prueba de que usa datos reales).
+
+> Detalle técnico del panel y el chatbot en
+> [`docs/09-modelo-y-sistema.md`](docs/09-modelo-y-sistema.md) y
+> [`docs/08-chatbot-bi.md`](docs/08-chatbot-bi.md).
 
 ---
 

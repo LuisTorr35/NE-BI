@@ -99,10 +99,11 @@ Una vez el riesgo está en la BD, el sistema te lo entrega por **tres vías**:
    Su % de riesgo, su nivel, la acción sugerida, productos recomendados de su
    categoría, y el botón **"Re-evaluar en vivo"** (camino §3.2).
 
-3. **Chatbot BI** (`Asistente BI`)
+3. **Chatbot BI** (botón flotante 🤖 abajo a la derecha, disponible en todo el panel)
    Preguntas en lenguaje natural. El bot **no inventa**: consulta esas mismas
    columnas con herramientas seguras (`BiTools`) vía tool-calling y redacta la
-   respuesta con datos reales. Detalle en [`08-chatbot-bi.md`](08-chatbot-bi.md).
+   respuesta con datos reales (incluidos porcentajes ya calculados). Detalle en
+   [`08-chatbot-bi.md`](08-chatbot-bi.md).
 
 ---
 

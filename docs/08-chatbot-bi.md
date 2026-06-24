@@ -55,8 +55,8 @@ si necesita varias consultas. Lo controla un `for` en `GroqService::preguntar()`
 | `app/Services/BiTools.php` | Las **herramientas**: consultas Eloquent acotadas + sus definiciones |
 | `app/Services/GroqService.php` | Cliente HTTP a Groq + orquesta el ciclo de tool-calling |
 | `app/Http/Controllers/Admin/ChatbotController.php` | Endpoints web + historial en sesión |
-| `resources/views/admin/asistente/index.blade.php` | La interfaz de chat (Tailwind + JS) |
-| rutas en `routes/web.php` | `/admin/asistente`, `/asistente/preguntar`, `/asistente/limpiar` |
+| `resources/views/admin/partials/chatbot.blade.php` | El **widget flotante** de chat (botón abajo a la derecha, presente en todo el panel) |
+| rutas en `routes/web.php` | `/asistente/preguntar`, `/asistente/limpiar` (`/admin/asistente` redirige al dashboard) |
 
 ---
 
@@ -68,16 +68,21 @@ está siempre anclado a datos reales.
 
 | Herramienta | Qué devuelve | Ejemplo de pregunta |
 |---|---|---|
-| `resumen_riesgo()` | Conteo por nivel (alto/medio/moderado/bajo) | "¿cuántos en cada nivel?" |
-| `clientes_en_riesgo(nivel, categoria, ciudad, limite)` | Lista filtrada, ordenada por probabilidad | "los de alto riesgo en celulares" |
-| `buscar_cliente(nombre)` | Riesgo y datos de un cliente concreto | "¿X se va a abandonar?" |
-| `stats_por_categoria()` | Riesgo agrupado por categoría favorita | "¿qué categoría tiene más riesgo?" |
-| `stats_por_ciudad()` | Riesgo agrupado por City Tier | "¿qué ciudad tiene más riesgo?" |
+| `resumen_riesgo()` | Conteo por nivel (alto/medio/moderado/bajo), total general y **porcentajes** (`por_nivel_pct`, `en_riesgo_pct`) | "¿cuántos en cada nivel?", "¿qué % está en riesgo?" |
+| `clientes_en_riesgo(nivel, categoria, ciudad, limite)` | Lista filtrada, ordenada por probabilidad (cada cliente con su `probabilidad` en %) | "los de alto riesgo en celulares" |
+| `buscar_cliente(nombre)` | Riesgo y datos de un cliente concreto (probabilidad en %) | "¿X se va a abandonar?" |
+| `stats_por_categoria()` | Por categoría favorita: total, en riesgo, **`pct_en_riesgo`** y probabilidad media | "¿qué categoría tiene más riesgo?", "¿qué % de celulares está en riesgo?" |
+| `stats_por_ciudad()` | Por City Tier: total, en riesgo, **`pct_en_riesgo`** y probabilidad media | "¿qué ciudad tiene más riesgo?" |
 
 Detalles de seguridad/calidad:
 - **Tope de 50 filas** (`LIMITE_MAX`) para no inflar tokens.
 - `normalizarCategoria()` mapea términos en español ("celulares" → `Mobile Phone`).
 - Las definiciones en formato OpenAI/Groq están en `BiTools::definiciones()`.
+- **Porcentajes pre-calculados:** las herramientas de agregados (`resumen_riesgo`,
+  `stats_por_categoria`, `stats_por_ciudad`) devuelven el porcentaje ya calculado en PHP
+  (campos `*_pct`). Así el modelo **reporta el valor exacto en vez de hacer aritmética**
+  (los LLM se equivocan al dividir). El system prompt le ordena usar esos campos tal cual,
+  y coinciden con los porcentajes del Dashboard BI porque salen de la misma fuente.
 
 ---
 
@@ -113,6 +118,8 @@ En `GroqService::systemPrompt()` se le imponen reglas estrictas:
 - Solo habla de churn/clientes de SOLE; rechaza temas ajenos.
 - **Nunca inventa** datos: para cualquier dato concreto DEBE llamar a una herramienta.
 - Habla de "probabilidad de abandono", no de certezas.
+- **Usa los porcentajes que ya traen las herramientas** (`por_nivel_pct`, `en_riesgo_pct`,
+  `pct_en_riesgo`); no los recalcula a mano.
 - Sugiere la acción de retención según el nivel (alto → cupón, etc.).
 
 ---
@@ -145,7 +152,8 @@ La API de Groq es **compatible con la de OpenAI**, por eso el endpoint es
 
 ## 8. Cómo se usa
 
-1. Entra al admin → menú lateral **🤖 Asistente BI**.
+1. Entra al admin y pulsa el **botón flotante 🤖** abajo a la derecha (disponible en
+   cualquier página del panel).
 2. Escribe una pregunta o usa las sugerencias rápidas.
-3. Bajo cada respuesta verás qué herramienta consultó (ej. `🔧 consultó: clientes_en_riesgo`),
+3. Bajo cada respuesta verás qué herramienta consultó (ej. `🔧 clientes_en_riesgo`),
    prueba de que la respuesta sale de datos reales y no inventados.

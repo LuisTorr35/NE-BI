@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Admin') · SOLE</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 <div class="flex min-h-screen">
@@ -22,10 +23,6 @@
             <a href="{{ route('admin.riesgo.index') }}"
                class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.riesgo.*') ? 'bg-slate-700 text-white' : 'hover:bg-slate-800' }}">
                 ⚠️ Clientes en riesgo
-            </a>
-            <a href="{{ route('admin.asistente.index') }}"
-               class="block px-3 py-2 rounded-lg {{ request()->routeIs('admin.asistente.*') ? 'bg-slate-700 text-white' : 'hover:bg-slate-800' }}">
-                🤖 Asistente BI
             </a>
             <a href="{{ route('catalog.index') }}" target="_blank"
                class="block px-3 py-2 rounded-lg hover:bg-slate-800">
@@ -51,5 +48,7 @@
         @yield('content')
     </main>
 </div>
+
+@include('admin.partials.chatbot')
 </body>
 </html>

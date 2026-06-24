@@ -20,7 +20,16 @@ class CustomerAuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::guard('customer')->attempt($credentials, $request->boolean('remember'))) {
+        $remember = $request->boolean('remember');
+
+        // 1. Si las credenciales son de un administrador (tabla users) -> panel admin/BI.
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        // 2. Si no, intentar como cliente (tabla customers) -> tienda.
+        if (Auth::guard('customer')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('catalog.index'))
                 ->with('ok', 'Bienvenido de nuevo.');

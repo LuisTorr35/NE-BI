@@ -198,7 +198,6 @@ Proyecto académico; se dejaron fuera (o simplificadas) varias cosas a propósit
 - El servicio en vivo (FastAPI) se levanta aparte y su puerto debe coincidir con
   `CHURN_API_URL`. Si está apagado, el panel usa el último scoring por lotes.
 - Sin "Mis pedidos" ni historial de compras para el cliente.
-- Dashboard sin gráficos (muestra conteos/tablas).
 - Productos sin imágenes.
 - El modelo se entrenó con un dataset de Kaggle adaptado al rubro; no son clientes
   reales y las acciones de retención son ilustrativas.

@@ -37,7 +37,7 @@ class BiTools
                 'type' => 'function',
                 'function' => [
                     'name' => 'resumen_riesgo',
-                    'description' => 'Devuelve el conteo total de clientes por nivel de riesgo de abandono (alto, medio, moderado, bajo) y el total general. Úsalo para preguntas de cuántos clientes hay en cada nivel.',
+                    'description' => 'Devuelve el conteo de clientes por nivel de riesgo (alto, medio, moderado, bajo), el total general y el PORCENTAJE de cada nivel sobre el total (por_nivel_pct) más el % total en riesgo (en_riesgo_pct). Úsalo para "cuántos clientes hay en cada nivel" o "qué porcentaje está en riesgo".',
                     'parameters' => ['type' => 'object', 'properties' => (object) []],
                 ],
             ],
@@ -92,7 +92,7 @@ class BiTools
                 'type' => 'function',
                 'function' => [
                     'name' => 'stats_por_categoria',
-                    'description' => 'Estadísticas de riesgo agrupadas por categoría favorita: total de clientes, cuántos en riesgo y probabilidad media. Úsalo para "qué categoría tiene más riesgo".',
+                    'description' => 'Estadísticas de riesgo por categoría favorita: total de clientes, cuántos en riesgo, el porcentaje en riesgo (pct_en_riesgo) y la probabilidad media. Úsalo para "qué categoría tiene más riesgo" o "qué % de celulares está en riesgo".',
                     'parameters' => ['type' => 'object', 'properties' => (object) []],
                 ],
             ],
@@ -100,7 +100,7 @@ class BiTools
                 'type' => 'function',
                 'function' => [
                     'name' => 'stats_por_ciudad',
-                    'description' => 'Estadísticas de riesgo agrupadas por ciudad (City Tier): total, en riesgo y probabilidad media. Úsalo para "qué ciudad tiene más riesgo".',
+                    'description' => 'Estadísticas de riesgo por ciudad (City Tier): total, en riesgo, el porcentaje en riesgo (pct_en_riesgo) y la probabilidad media. Úsalo para "qué ciudad tiene más riesgo" o "qué % de cada tier está en riesgo".',
                     'parameters' => ['type' => 'object', 'properties' => (object) []],
                 ],
             ],
@@ -129,15 +129,33 @@ class BiTools
             ->groupBy('churn_level')
             ->pluck('n', 'churn_level');
 
+        $total = Customer::count();
+        $pct   = fn (int $n) => $total ? round($n / $total * 100, 1) . '%' : '0%';
+
+        $alto     = (int) ($porNivel['alto'] ?? 0);
+        $medio    = (int) ($porNivel['medio'] ?? 0);
+        $moderado = (int) ($porNivel['moderado'] ?? 0);
+        $bajo     = (int) ($porNivel['bajo'] ?? 0);
+        $enRiesgo = $alto + $medio;
+
         return [
-            'total_clientes' => Customer::count(),
+            'total_clientes' => $total,
             'por_nivel' => [
-                'alto'     => (int) ($porNivel['alto'] ?? 0),
-                'medio'    => (int) ($porNivel['medio'] ?? 0),
-                'moderado' => (int) ($porNivel['moderado'] ?? 0),
-                'bajo'     => (int) ($porNivel['bajo'] ?? 0),
+                'alto'     => $alto,
+                'medio'    => $medio,
+                'moderado' => $moderado,
+                'bajo'     => $bajo,
             ],
-            'nota' => 'alto >= 70% prob., medio 40-69%, moderado 20-39%, bajo < 20%.',
+            // Porcentaje de cada nivel sobre el total (ya calculado, no lo recalcules).
+            'por_nivel_pct' => [
+                'alto'     => $pct($alto),
+                'medio'    => $pct($medio),
+                'moderado' => $pct($moderado),
+                'bajo'     => $pct($bajo),
+            ],
+            'en_riesgo'     => $enRiesgo,
+            'en_riesgo_pct' => $pct($enRiesgo),
+            'nota' => 'En riesgo = alto + medio. Umbrales: alto >= 70% prob., medio 40-69%, moderado 20-39%, bajo < 20%.',
         ];
     }
 
@@ -220,10 +238,12 @@ class BiTools
             ->get();
 
         return ['por_categoria' => $rows->map(fn ($r) => [
-            'categoria'  => self::CATEGORIAS[$r->prefered_order_cat] ?? $r->prefered_order_cat,
-            'total'      => (int) $r->total,
-            'en_riesgo'  => (int) $r->en_riesgo,
-            'prob_media' => $r->prob_media . '%',
+            'categoria'      => self::CATEGORIAS[$r->prefered_order_cat] ?? $r->prefered_order_cat,
+            'total'          => (int) $r->total,
+            'en_riesgo'      => (int) $r->en_riesgo,
+            // % de clientes de esa categoría que están en riesgo (alto+medio), ya calculado.
+            'pct_en_riesgo'  => $r->total ? round($r->en_riesgo / $r->total * 100, 1) . '%' : '0%',
+            'prob_media'     => $r->prob_media . '%',
         ])->all()];
     }
 
@@ -239,10 +259,12 @@ class BiTools
             ->get();
 
         return ['por_ciudad' => $rows->map(fn ($r) => [
-            'city_tier'  => (int) $r->city_tier,
-            'total'      => (int) $r->total,
-            'en_riesgo'  => (int) $r->en_riesgo,
-            'prob_media' => $r->prob_media . '%',
+            'city_tier'      => (int) $r->city_tier,
+            'total'          => (int) $r->total,
+            'en_riesgo'      => (int) $r->en_riesgo,
+            // % de clientes de esa ciudad que están en riesgo (alto+medio), ya calculado.
+            'pct_en_riesgo'  => $r->total ? round($r->en_riesgo / $r->total * 100, 1) . '%' : '0%',
+            'prob_media'     => $r->prob_media . '%',
         ])->all()];
     }
 

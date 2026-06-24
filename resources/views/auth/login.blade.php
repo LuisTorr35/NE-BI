@@ -4,7 +4,7 @@
 @section('content')
 <div class="max-w-md mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-8 mt-6">
     <h1 class="text-xl font-bold mb-1">Iniciar sesión</h1>
-    <p class="text-sm text-slate-500 mb-6">Ingresa con tu cuenta de cliente.</p>
+    <p class="text-sm text-slate-500 mb-6">Ingresa con tu cuenta. Los administradores entran por aquí al panel BI.</p>
 
     <form action="{{ route('login.attempt') }}" method="POST" class="space-y-4">
         @csrf

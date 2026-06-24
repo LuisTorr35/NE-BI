@@ -35,10 +35,9 @@ Route::middleware('auth:customer')->group(function () {
 
 // --- Panel de administración + Business Intelligence ---
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::middleware('guest:web')->group(function () {
-        Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
-        Route::post('/login', [AdminAuthController::class, 'login'])->name('login.attempt');
-    });
+    // El acceso de admin ahora es por la pantalla única de login (/login):
+    // si las credenciales son de un administrador, redirige solo al panel.
+    Route::get('/login', fn () => redirect()->route('login'))->name('login');
 
     Route::middleware('auth:web')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
@@ -49,8 +48,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/cliente/{customer}', [RiesgoController::class, 'show'])->name('riesgo.show');
         Route::post('/cliente/{customer}/evaluar', [RiesgoController::class, 'evaluar'])->name('riesgo.evaluar');
 
-        // Asistente BI (chatbot Groq/Llama)
-        Route::get('/asistente', [ChatbotController::class, 'index'])->name('asistente.index');
+        // Asistente BI (chatbot Groq/Llama). Ahora es un widget flotante en todo el
+        // panel; la antigua página dedicada redirige al dashboard.
+        Route::get('/asistente', fn () => redirect()->route('admin.dashboard'))->name('asistente.index');
         Route::post('/asistente/preguntar', [ChatbotController::class, 'preguntar'])->name('asistente.preguntar');
         Route::post('/asistente/limpiar', [ChatbotController::class, 'limpiar'])->name('asistente.limpiar');
     });
